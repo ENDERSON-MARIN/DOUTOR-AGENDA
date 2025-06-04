@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, { message: "Nome é obrigatório" }),
@@ -48,8 +50,37 @@ const RegisterForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof registerSchema>) => {
-    console.log(data);
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+    try {
+      await authClient.signUp.email({
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        callbackURL: "/dashboard",
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Conta criada com sucesso!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      form.reset();
+    } catch (error: unknown) {
+      let errorMessage = "Tente novamente mais tarde.";
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as { message?: unknown }).message === "string"
+      ) {
+        errorMessage = (error as { message: string }).message;
+      }
+      Swal.fire({
+        icon: "error",
+        title: "Erro ao criar conta",
+        text: errorMessage,
+      });
+    }
   };
 
   return (
@@ -82,7 +113,11 @@ const RegisterForm = () => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Digite seu Email..." {...field} />
+                      <Input
+                        type="email"
+                        placeholder="Digite seu Email..."
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -95,7 +130,11 @@ const RegisterForm = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="Digite seu Password..." {...field} />
+                      <Input
+                        type="password"
+                        placeholder="Digite seu Password..."
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
