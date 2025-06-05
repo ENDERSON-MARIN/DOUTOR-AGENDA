@@ -1,6 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { z } from "zod";
@@ -40,6 +42,7 @@ const registerSchema = z.object({
 });
 
 const RegisterForm = () => {
+  const router = useRouter();
   // 1. Define your form.
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -50,38 +53,52 @@ const RegisterForm = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
-    try {
-      await authClient.signUp.email({
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
+    await authClient.signUp.email(
+      {
         email: values.email,
         password: values.password,
         name: values.name,
-        callbackURL: "/dashboard",
-      });
-      Swal.fire({
-        icon: "success",
-        title: "Conta criada com sucesso!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      form.reset();
-    } catch (error: unknown) {
-      let errorMessage = "Tente novamente mais tarde.";
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error &&
-        typeof (error as { message?: unknown }).message === "string"
-      ) {
-        errorMessage = (error as { message: string }).message;
-      }
-      Swal.fire({
-        icon: "error",
-        title: "Erro ao criar conta",
-        text: errorMessage,
-      });
-    }
-  };
+      },
+      {
+        onSuccess: () => {
+          Swal.fire({
+            icon: "success",
+            title: "Conta criada com sucesso!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          form.reset();
+          router.push("/dashboard");
+        },
+        onError: (ctx) => {
+          const errorMessage ="Ocorreu um erro ao criar sua conta.Tente novamente mais tarde!";
+          if (ctx.error.code === "USER_ALREADY_EXISTS") {
+            Swal.fire({
+              icon: "error",
+              title: "Erro ao criar conta",
+              text: "E-mail já cadastrado. Verifique e tente novamente!",
+              position: "center",
+              showConfirmButton: true,
+              confirmButtonColor: "#2b7fff",
+              showCancelButton: false,
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Ok",
+              cancelButtonText: "Erro",
+              // timer: 1500
+            });
+            return;
+          }
+          Swal.fire({
+            icon: "error",
+            title: "Erro ao criar conta",
+            text: errorMessage,
+          });
+          return;
+        },
+      },
+    );
+  }
 
   return (
     <>
@@ -142,8 +159,16 @@ const RegisterForm = () => {
               />
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">
-                Criar conta
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Criar conta"
+                )}
               </Button>
             </CardFooter>
           </form>
