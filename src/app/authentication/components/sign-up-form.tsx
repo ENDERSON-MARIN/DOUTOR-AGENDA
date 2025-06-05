@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import Swal from "sweetalert2";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -62,39 +62,16 @@ const RegisterForm = () => {
       },
       {
         onSuccess: () => {
-          Swal.fire({
-            icon: "success",
-            title: "Conta criada com sucesso!",
-            showConfirmButton: false,
-            timer: 1500,
-          });
+          toast.success('Sua conta foi criada com sucesso!')
           form.reset();
-          router.push("/dashboard");
+          router.push("/authentication");
         },
         onError: (ctx) => {
-          const errorMessage ="Ocorreu um erro ao criar sua conta.Tente novamente mais tarde!";
           if (ctx.error.code === "USER_ALREADY_EXISTS") {
-            Swal.fire({
-              icon: "error",
-              title: "Erro ao criar conta",
-              text: "E-mail já cadastrado. Verifique e tente novamente!",
-              position: "center",
-              showConfirmButton: true,
-              confirmButtonColor: "#2b7fff",
-              showCancelButton: false,
-              cancelButtonColor: "#d33",
-              confirmButtonText: "Ok",
-              cancelButtonText: "Erro",
-              // timer: 1500
-            });
+            toast.error('Email ja cadastrado, por favor verifique e tente novamente!')
             return;
           }
-          Swal.fire({
-            icon: "error",
-            title: "Erro ao criar conta",
-            text: errorMessage,
-          });
-          return;
+          toast.error("Erro ao criar conta, por favor tente mais tarde!");
         },
       },
     );
