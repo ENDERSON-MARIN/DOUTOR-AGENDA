@@ -60,7 +60,7 @@ const LoginForm = () => {
       {
         onSuccess: () => {
           route.push("/dashboard");
-          toast.success('Ben-vindo a plataforma!')
+          toast.success("Ben-vindo a plataforma!");
         },
         onError: () => {
           toast.error(
@@ -125,9 +125,8 @@ const LoginForm = () => {
                 {form.formState.isSubmitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  "Criar conta"
+                  "Entrar"
                 )}
-                Entrar
               </Button>
             </CardFooter>
           </form>

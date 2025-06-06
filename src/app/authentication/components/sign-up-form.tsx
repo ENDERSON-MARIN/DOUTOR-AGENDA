@@ -64,7 +64,7 @@ const RegisterForm = () => {
         onSuccess: () => {
           toast.success('Sua conta foi criada com sucesso!')
           form.reset();
-          router.push("/authentication");
+          router.push("/dashboard");
         },
         onError: (ctx) => {
           if (ctx.error.code === "USER_ALREADY_EXISTS") {
