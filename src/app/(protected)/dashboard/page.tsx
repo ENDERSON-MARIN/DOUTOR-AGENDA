@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { usersToClinicsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
-import LogoutButtom from "./components/logout-buttom";
+import LogoutButtom from "./_components/logout-buttom";
 
 const DashboardPage = async () => {
   // Desta forma se obtiene la sesion mediante client component, pero se recomienda mejor usar Server
