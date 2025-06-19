@@ -1,9 +1,9 @@
-import { eq } from "drizzle-orm";
+// import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { db } from "@/db";
-import { usersToClinicsTable } from "@/db/schema";
+// import { db } from "@/db";
+// import { usersToClinicsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 
 import LogoutButtom from "./_components/logout-buttom";
@@ -20,18 +20,19 @@ const DashboardPage = async () => {
 
   // console.log(session);
 
-  if (!session?.user) {
-    redirect("/authentication");
-  }
+  if (!session?.user) redirect("/authentication");
 
   //Preciso pegar as clinicas do usuario logado
-  const clinics = await db.query.usersToClinicsTable.findMany({
-    where: eq(usersToClinicsTable.userId, session.user.id),
-  });
+  // const clinics = await db.query.usersToClinicsTable.findMany({
+  //   where: eq(usersToClinicsTable.userId, session.user.id),
+  // });
 
-  if (clinics.length === 0) {
-    redirect("/clinic-form");
-  }
+  // if (clinics.length === 0) {
+  //   redirect("/clinic-form");
+  // }
+
+  //Se optimiza desta manera porque ya fue adicionado en el modelo las clinicas del usuario.
+  if (!session.user.clinic) redirect("/clinic-form");
 
   return (
     <div>
