@@ -113,7 +113,7 @@ const UpsertDoctorForm = () => {
             name="specialty"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Especialidade</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
