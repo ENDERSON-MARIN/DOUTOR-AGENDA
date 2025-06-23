@@ -1,9 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
+import { toast } from "sonner";
 import { z } from "zod";
 
+import { upsertDoctor } from "@/actions/upsert-doctor";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -30,10 +32,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { doctorsTable } from "@/db/schema";
 
 import { medicalSpecialties } from "../_constants";
 
-//1.- Define o schema do form
 const formSchema = z
   .object({
     name: z.string().trim().min(1, {
@@ -65,34 +67,59 @@ const formSchema = z
     },
   );
 
-const UpsertDoctorForm = () => {
-  // 2. Define your form inicial
+interface UpsertDoctorFormProps {
+  doctor?: typeof doctorsTable.$inferSelect;
+  onSuccess?: () => void;
+}
+
+const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
+    shouldUnregister: true,
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      specialty: "",
-      appointmentPrice: 0,
-      availableFromWeekDay: "",
-      availableToWeekDay: "",
-      availableFromTime: "",
-      availableToTime: "",
+      name: doctor?.name ?? "",
+      specialty: doctor?.specialty ?? "",
+      appointmentPrice: doctor?.appointmentPriceInCents
+        ? doctor.appointmentPriceInCents / 100
+        : 0,
+      availableFromWeekDay: doctor?.availableFromWeekDay?.toString() ?? "1",
+      availableToWeekDay: doctor?.availableToWeekDay?.toString() ?? "5",
+      availableFromTime: doctor?.availableFromTime ?? "",
+      availableToTime: doctor?.availableToTime ?? "",
+    },
+  });
+  const upsertDoctorAction = useAction(upsertDoctor, {
+    onSuccess: () => {
+      toast.success("Médico adicionado com sucesso.");
+      onSuccess?.();
+    },
+    onError: () => {
+      toast.error("Erro ao adicionar médico.");
     },
   });
 
-  const onsubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    upsertDoctorAction.execute({
+      ...values,
+      id: doctor?.id,
+      availableFromWeekDay: parseInt(values.availableFromWeekDay),
+      availableToWeekDay: parseInt(values.availableToWeekDay),
+      appointmentPriceInCents: values.appointmentPrice * 100,
+    });
   };
 
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Adicionar Médico</DialogTitle>
-        <DialogDescription>Adicione um novo médico</DialogDescription>
+        <DialogTitle>{doctor ? doctor.name : "Adicionar médico"}</DialogTitle>
+        <DialogDescription>
+          {doctor
+            ? "Edite as informações desse médico."
+            : "Adicione um novo médico."}
+        </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onsubmit)} className="space-y-4">
-          {/* init name */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="name"
@@ -100,14 +127,12 @@ const UpsertDoctorForm = () => {
               <FormItem>
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
-                  <Input placeholder="Digite o Nome..." {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          {/* end name */}
-          {/* init specialty */}
           <FormField
             control={form.control}
             name="specialty"
@@ -135,8 +160,6 @@ const UpsertDoctorForm = () => {
               </FormItem>
             )}
           />
-          {/* end specialty */}
-          {/* init appointmentPrice */}
           <FormField
             control={form.control}
             name="appointmentPrice"
@@ -161,8 +184,6 @@ const UpsertDoctorForm = () => {
               </FormItem>
             )}
           />
-          {/* end appointmentPrice */}
-          {/* init availableFromWeekDay */}
           <FormField
             control={form.control}
             name="availableFromWeekDay"
@@ -192,8 +213,6 @@ const UpsertDoctorForm = () => {
               </FormItem>
             )}
           />
-          {/* end availableFromWeekDay */}
-          {/* init availableToWeekDay */}
           <FormField
             control={form.control}
             name="availableToWeekDay"
@@ -202,7 +221,7 @@ const UpsertDoctorForm = () => {
                 <FormLabel>Dia final de disponibilidade</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  defaultValue={field.value?.toString()}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -223,8 +242,6 @@ const UpsertDoctorForm = () => {
               </FormItem>
             )}
           />
-          {/* end availableToWeekDay */}
-          {/* init availableFromTime */}
           <FormField
             control={form.control}
             name="availableFromTime"
@@ -294,8 +311,6 @@ const UpsertDoctorForm = () => {
               </FormItem>
             )}
           />
-          {/* end availableFromTime */}
-          {/* init availableToTime */}
           <FormField
             control={form.control}
             name="availableToTime"
@@ -365,19 +380,13 @@ const UpsertDoctorForm = () => {
               </FormItem>
             )}
           />
-          {/* end availableToTime */}
-
           <DialogFooter>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                "Adicionar"
-              )}
+            <Button type="submit" disabled={upsertDoctorAction.isPending}>
+              {upsertDoctorAction.isPending
+                ? "Salvando..."
+                : doctor
+                  ? "Salvar"
+                  : "Adicionar"}
             </Button>
           </DialogFooter>
         </form>
