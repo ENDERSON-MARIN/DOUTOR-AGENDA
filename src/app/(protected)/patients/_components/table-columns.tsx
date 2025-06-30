@@ -6,7 +6,6 @@ import { patientsTable } from "@/db/schema";
 
 import PatientsTableActions from "./table-actions";
 
-
 type Patient = typeof patientsTable.$inferSelect;
 
 export const patientsTableColumns: ColumnDef<Patient>[] = [
@@ -16,7 +15,7 @@ export const patientsTableColumns: ColumnDef<Patient>[] = [
     header: "Nome",
   },
   {
-    id: "email",  
+    id: "email",
     accessorKey: "email",
     header: "Email",
   },
