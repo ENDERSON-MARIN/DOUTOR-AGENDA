@@ -12,7 +12,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-import { UpsertPatientForm } from './upsert-patient-form';
+import UpsertPatientForm from './upsert-patient-form';
+
+
 
 export function AddPatientButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +30,10 @@ export function AddPatientButton() {
         <DialogHeader>
           <DialogTitle>Adicionar paciente</DialogTitle>
         </DialogHeader>
-        <UpsertPatientForm onSuccess={() => setIsOpen(false)} />
+        <UpsertPatientForm
+          onSuccess={() => setIsOpen(false)}
+          isOpen={isOpen}
+        />
       </DialogContent>
     </Dialog>
   );
