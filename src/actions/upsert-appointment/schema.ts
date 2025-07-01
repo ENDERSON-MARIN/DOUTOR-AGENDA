@@ -11,6 +11,9 @@ export const upsertAppointmentSchema = z.object({
   date: z.date({
     required_error: "Data é obrigatória.",
   }),
+  time: z.string({
+    required_error: "Horário é obrigatório.",
+  }),
   appointmentPriceInCents: z.number().min(1, {
     message: "Valor da consulta é obrigatório.",
   }),
