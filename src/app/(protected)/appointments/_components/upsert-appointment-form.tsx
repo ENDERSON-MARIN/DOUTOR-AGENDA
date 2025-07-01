@@ -42,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { doctorsTable, patientsTable } from "@/db/schema";
+import { appointmentsTable,doctorsTable, patientsTable } from "@/db/schema";
 
 const formSchema = z.object({
   patientId: z.string().uuid({
@@ -65,19 +65,24 @@ const formSchema = z.object({
 interface UpsertAppointmentFormProps {
   doctors: (typeof doctorsTable.$inferSelect)[];
   patients: (typeof patientsTable.$inferSelect)[];
+  appointment?: typeof appointmentsTable.$inferSelect;
   onSuccess?: () => void;
 }
 
 export function UpsertAppointmentForm({
   doctors,
   patients,
+  appointment,
   onSuccess,
 }: UpsertAppointmentFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      appointmentPrice: 0,
-      time: "",
+      appointmentPrice: appointment?.appointmentPriceInCents ? appointment.appointmentPriceInCents / 100 : 0,
+      patientId: appointment?.patientId,
+      doctorId: appointment?.doctorId,
+      date: appointment?.date ? new Date(appointment.date) : undefined,
+      time: appointment?.date ? format(new Date(appointment.date), "HH:mm:ss") : "",
     },
   });
 
