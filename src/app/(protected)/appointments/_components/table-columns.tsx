@@ -8,7 +8,6 @@ import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 
 import { AppointmentsTableActions } from "./table-actions";
 
-
 type AppointmentWithRelations = typeof appointmentsTable.$inferSelect & {
   patient: typeof patientsTable.$inferSelect;
   doctor: typeof doctorsTable.$inferSelect;
@@ -30,20 +29,20 @@ export const appointmentsTableColumns: ColumnDef<AppointmentWithRelations>[] = [
     },
   },
   {
+    id: "specialty",
+    accessorKey: "doctor.specialty",
+    header: "Especialidade",
+  },
+  {
     id: "date",
     accessorKey: "date",
-    header: "Data e Hora",
+    header: "Data e Horário",
     cell: (params) => {
       const appointment = params.row.original;
       return format(new Date(appointment.date), "dd/MM/yyyy 'às' HH:mm", {
         locale: ptBR,
       });
     },
-  },
-  {
-    id: "specialty",
-    accessorKey: "doctor.specialty",
-    header: "Especialidade",
   },
   {
     id: "price",

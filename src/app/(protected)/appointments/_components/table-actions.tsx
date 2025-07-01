@@ -38,7 +38,9 @@ interface AppointmentsTableActionsProps {
   };
 }
 
-export function AppointmentsTableActions({ appointment }: AppointmentsTableActionsProps) {
+export function AppointmentsTableActions({
+  appointment,
+}: AppointmentsTableActionsProps) {
   const [upsertDialogIsOpen, setUpsertDialogIsOpen] = useState(false);
 
   const deleteAppointmentAction = useAction(deleteAppointment, {
@@ -66,7 +68,8 @@ export function AppointmentsTableActions({ appointment }: AppointmentsTableActio
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuLabel>
-              {appointment.patient.name} - {format(new Date(appointment.date), "PPP", { locale: ptBR })}
+              {appointment.patient.name} -{" "}
+              {format(new Date(appointment.date), "PPP", { locale: ptBR })}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => setUpsertDialogIsOpen(true)}>
@@ -109,4 +112,4 @@ export function AppointmentsTableActions({ appointment }: AppointmentsTableActio
       </Dialog>
     </>
   );
-} 
+}

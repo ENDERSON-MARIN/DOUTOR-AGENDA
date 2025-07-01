@@ -42,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { appointmentsTable,doctorsTable, patientsTable } from "@/db/schema";
+import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
 
 const formSchema = z.object({
   patientId: z.string().uuid({
@@ -78,11 +78,15 @@ export function UpsertAppointmentForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      appointmentPrice: appointment?.appointmentPriceInCents ? appointment.appointmentPriceInCents / 100 : 0,
+      appointmentPrice: appointment?.appointmentPriceInCents
+        ? appointment.appointmentPriceInCents / 100
+        : 0,
       patientId: appointment?.patientId,
       doctorId: appointment?.doctorId,
       date: appointment?.date ? new Date(appointment.date) : undefined,
-      time: appointment?.date ? format(new Date(appointment.date), "HH:mm:ss") : "",
+      time: appointment?.date
+        ? format(new Date(appointment.date), "HH:mm:ss")
+        : "",
     },
   });
 
@@ -132,9 +136,13 @@ export function UpsertAppointmentForm({
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Novo Agendamento</DialogTitle>
+        <DialogTitle>
+          {appointment ? "Editar Agendamento" : "Novo Agendamento"}
+        </DialogTitle>
         <DialogDescription>
-          Preencha os dados para criar um novo agendamento.
+          {appointment
+            ? "Edite os dados do agendamento."
+            : "Preencha os dados para criar um novo agendamento."}
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
@@ -310,7 +318,7 @@ export function UpsertAppointmentForm({
               type="submit"
               disabled={upsertAppointmentAction.status === "executing"}
             >
-              Criar
+              {appointment ? "Salvar" : "Criar"}
             </Button>
           </DialogFooter>
         </form>

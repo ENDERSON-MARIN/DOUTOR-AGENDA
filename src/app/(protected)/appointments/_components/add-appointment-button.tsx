@@ -6,13 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { doctorsTable, patientsTable } from "@/db/schema";
 
-import { UpsertAppointmentForm } from './upsert-appointment-form';
-
-
+import { UpsertAppointmentForm } from "./upsert-appointment-form";
 
 interface AddAppointmentButtonProps {
-  doctors: typeof doctorsTable.$inferSelect[];
-  patients: typeof patientsTable.$inferSelect[];
+  doctors: (typeof doctorsTable.$inferSelect)[];
+  patients: (typeof patientsTable.$inferSelect)[];
 }
 
 export function AddAppointmentButton({
@@ -33,4 +31,4 @@ export function AddAppointmentButton({
       />
     </Dialog>
   );
-} 
+}
