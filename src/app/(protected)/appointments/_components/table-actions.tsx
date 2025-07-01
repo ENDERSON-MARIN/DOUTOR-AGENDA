@@ -1,8 +1,7 @@
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { EditIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
+"use client";
+
+import { MoreVerticalIcon, TrashIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { deleteAppointment } from "@/actions/delete-appointment";
@@ -18,7 +17,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Dialog } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,22 +25,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
+import { appointmentsTable } from "@/db/schema";
 
-import { UpsertAppointmentForm } from "./upsert-appointment-form";
+type AppointmentWithRelations = typeof appointmentsTable.$inferSelect & {
+  patient: {
+    id: string;
+    name: string;
+    email: string;
+    phoneNumber: string;
+    sex: "male" | "female";
+  };
+  doctor: {
+    id: string;
+    name: string;
+    specialty: string;
+  };
+};
 
 interface AppointmentsTableActionsProps {
-  appointment: typeof appointmentsTable.$inferSelect & {
-    doctor: typeof doctorsTable.$inferSelect;
-    patient: typeof patientsTable.$inferSelect;
-  };
+  appointment: AppointmentWithRelations;
 }
 
-export function AppointmentsTableActions({
+const AppointmentsTableActions = ({
   appointment,
-}: AppointmentsTableActionsProps) {
-  const [upsertDialogIsOpen, setUpsertDialogIsOpen] = useState(false);
-
+}: AppointmentsTableActionsProps) => {
   const deleteAppointmentAction = useAction(deleteAppointment, {
     onSuccess: () => {
       toast.success("Agendamento deletado com sucesso.");
@@ -58,58 +64,43 @@ export function AppointmentsTableActions({
   };
 
   return (
-    <>
-      <Dialog open={upsertDialogIsOpen} onOpenChange={setUpsertDialogIsOpen}>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="ghost" size="icon">
-              <MoreVerticalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>
-              {appointment.patient.name} -{" "}
-              {format(new Date(appointment.date), "PPP", { locale: ptBR })}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setUpsertDialogIsOpen(true)}>
-              <EditIcon className="mr-2 h-4 w-4" />
-              Editar
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Button variant="ghost" size="icon">
+          <MoreVerticalIcon className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>{appointment.patient.name}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <TrashIcon />
+              Excluir
             </DropdownMenuItem>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <TrashIcon className="mr-2 h-4 w-4" />
-                  Excluir
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Tem certeza que deseja deletar esse agendamento?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Essa ação não pode ser revertida.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteAppointmentClick}>
-                    Deletar
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <UpsertAppointmentForm
-          doctors={[appointment.doctor]}
-          patients={[appointment.patient]}
-          appointment={appointment}
-          onSuccess={() => setUpsertDialogIsOpen(false)}
-        />
-      </Dialog>
-    </>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Tem certeza que deseja deletar esse agendamento?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Essa ação não pode ser revertida. Isso irá deletar o agendamento
+                permanentemente.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteAppointmentClick}>
+                Deletar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
-}
+};
+
+export default AppointmentsTableActions;

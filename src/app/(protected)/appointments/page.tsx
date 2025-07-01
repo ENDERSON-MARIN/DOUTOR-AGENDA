@@ -13,7 +13,7 @@ import {
 import { db } from "@/db";
 import { auth } from "@/lib/auth";
 
-import { AddAppointmentButton } from "./_components/add-appointment-button";
+import AddAppointmentButton from "./_components/add-appointment-button";
 import { appointmentsTableColumns } from "./_components/table-columns";
 
 export default async function AppointmentsPage() {

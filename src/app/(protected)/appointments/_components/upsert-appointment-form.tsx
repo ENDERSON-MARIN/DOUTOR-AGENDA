@@ -1,8 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import dayjs from "dayjs";
 import { CalendarIcon } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import { useEffect } from "react";
@@ -11,6 +13,7 @@ import { NumericFormat } from "react-number-format";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { getAvailableTimes } from "@/actions/get-available-times";
 import { upsertAppointment } from "@/actions/upsert-appointment";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -42,74 +45,94 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
+import { doctorsTable, patientsTable } from "@/db/schema";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
-  patientId: z.string().uuid({
+  patientId: z.string().min(1, {
     message: "Paciente é obrigatório.",
   }),
-  doctorId: z.string().uuid({
+  doctorId: z.string().min(1, {
     message: "Médico é obrigatório.",
-  }),
-  date: z.date({
-    required_error: "Data é obrigatória.",
-  }),
-  time: z.string({
-    required_error: "Horário é obrigatório.",
   }),
   appointmentPrice: z.number().min(1, {
     message: "Valor da consulta é obrigatório.",
   }),
+  date: z.date({
+    message: "Data é obrigatória.",
+  }),
+  time: z.string().min(1, {
+    message: "Horário é obrigatório.",
+  }),
 });
 
 interface UpsertAppointmentFormProps {
-  doctors: (typeof doctorsTable.$inferSelect)[];
+  isOpen: boolean;
   patients: (typeof patientsTable.$inferSelect)[];
-  appointment?: typeof appointmentsTable.$inferSelect;
+  doctors: (typeof doctorsTable.$inferSelect)[];
   onSuccess?: () => void;
 }
 
-export function UpsertAppointmentForm({
-  doctors,
+const UpsertAppointmentForm = ({
   patients,
-  appointment,
+  doctors,
   onSuccess,
-}: UpsertAppointmentFormProps) {
+  isOpen,
+}: UpsertAppointmentFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
+    shouldUnregister: true,
     resolver: zodResolver(formSchema),
     defaultValues: {
-      appointmentPrice: appointment?.appointmentPriceInCents
-        ? appointment.appointmentPriceInCents / 100
-        : 0,
-      patientId: appointment?.patientId,
-      doctorId: appointment?.doctorId,
-      date: appointment?.date ? new Date(appointment.date) : undefined,
-      time: appointment?.date
-        ? format(new Date(appointment.date), "HH:mm:ss")
-        : "",
+      patientId: "",
+      doctorId: "",
+      appointmentPrice: 0,
+      date: undefined,
+      time: "",
     },
   });
 
-  const selectedDoctor = doctors.find(
-    (doctor) => doctor.id === form.watch("doctorId"),
-  );
+  const selectedDoctorId = form.watch("doctorId");
+  const selectedPatientId = form.watch("patientId");
+  const selectedDate = form.watch("date");
 
-  const selectedPatient = patients.find(
-    (patient) => patient.id === form.watch("patientId"),
-  );
+  const { data: availableTimes } = useQuery({
+    queryKey: ["available-times", selectedDate, selectedDoctorId],
+    queryFn: () =>
+      getAvailableTimes({
+        date: dayjs(selectedDate).format("YYYY-MM-DD"),
+        doctorId: selectedDoctorId,
+      }),
+    enabled: !!selectedDate && !!selectedDoctorId,
+  });
 
-  const isTimeSelectionEnabled = !!selectedDoctor && !!selectedPatient;
+  // Atualizar o preço quando o médico for selecionado
+  useEffect(() => {
+    if (selectedDoctorId) {
+      const selectedDoctor = doctors.find(
+        (doctor) => doctor.id === selectedDoctorId,
+      );
+      if (selectedDoctor) {
+        form.setValue(
+          "appointmentPrice",
+          selectedDoctor.appointmentPriceInCents / 100,
+        );
+      }
+    }
+  }, [selectedDoctorId, doctors, form]);
 
   useEffect(() => {
-    if (selectedDoctor) {
-      form.setValue(
-        "appointmentPrice",
-        selectedDoctor.appointmentPriceInCents / 100,
-      );
+    if (isOpen) {
+      form.reset({
+        patientId: "",
+        doctorId: "",
+        appointmentPrice: 0,
+        date: undefined,
+        time: "",
+      });
     }
-  }, [selectedDoctor, form]);
+  }, [isOpen, form]);
 
-  const upsertAppointmentAction = useAction(upsertAppointment, {
+  const createAppointmentAction = useAction(upsertAppointment, {
     onSuccess: () => {
       toast.success("Agendamento criado com sucesso.");
       onSuccess?.();
@@ -120,29 +143,33 @@ export function UpsertAppointmentForm({
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const [hours, minutes] = values.time.split(":");
-    const appointmentDate = new Date(values.date);
-    appointmentDate.setHours(parseInt(hours));
-    appointmentDate.setMinutes(parseInt(minutes));
-    appointmentDate.setSeconds(0);
-
-    upsertAppointmentAction.execute({
+    createAppointmentAction.execute({
       ...values,
-      date: appointmentDate,
       appointmentPriceInCents: values.appointmentPrice * 100,
     });
   };
 
+  const isDateAvailable = (date: Date) => {
+    if (!selectedDoctorId) return false;
+    const selectedDoctor = doctors.find(
+      (doctor) => doctor.id === selectedDoctorId,
+    );
+    if (!selectedDoctor) return false;
+    const dayOfWeek = date.getDay();
+    return (
+      dayOfWeek >= selectedDoctor?.availableFromWeekDay &&
+      dayOfWeek <= selectedDoctor?.availableToWeekDay
+    );
+  };
+
+  const isDateTimeEnabled = selectedPatientId && selectedDoctorId;
+
   return (
-    <DialogContent>
+    <DialogContent className="sm:max-w-[500px]">
       <DialogHeader>
-        <DialogTitle>
-          {appointment ? "Editar Agendamento" : "Novo Agendamento"}
-        </DialogTitle>
+        <DialogTitle>Novo agendamento</DialogTitle>
         <DialogDescription>
-          {appointment
-            ? "Edite os dados do agendamento."
-            : "Preencha os dados para criar um novo agendamento."}
+          Crie um novo agendamento para sua clínica.
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
@@ -174,6 +201,7 @@ export function UpsertAppointmentForm({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="doctorId"
@@ -192,7 +220,7 @@ export function UpsertAppointmentForm({
                   <SelectContent>
                     {doctors.map((doctor) => (
                       <SelectItem key={doctor.id} value={doctor.id}>
-                        {doctor.name}
+                        {doctor.name} - {doctor.specialty}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -208,21 +236,20 @@ export function UpsertAppointmentForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Valor da consulta</FormLabel>
-                <FormControl>
-                  <NumericFormat
-                    customInput={Input}
-                    value={field.value}
-                    onValueChange={(values) => {
-                      field.onChange(values.floatValue);
-                    }}
-                    disabled={!selectedDoctor}
-                    prefix="R$ "
-                    decimalScale={2}
-                    fixedDecimalScale
-                    decimalSeparator=","
-                    thousandSeparator="."
-                  />
-                </FormControl>
+                <NumericFormat
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value.floatValue);
+                  }}
+                  decimalScale={2}
+                  fixedDecimalScale
+                  decimalSeparator=","
+                  thousandSeparator="."
+                  prefix="R$ "
+                  allowNegative={false}
+                  disabled={!selectedDoctorId}
+                  customInput={Input}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -238,14 +265,16 @@ export function UpsertAppointmentForm({
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
-                        variant="outline"
-                        className={`w-full justify-start text-left font-normal ${
-                          !field.value && "text-muted-foreground"
-                        }`}
+                        variant={"outline"}
+                        disabled={!isDateTimeEnabled}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !field.value && "text-muted-foreground",
+                        )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value ? (
-                          format(field.value, "PPP")
+                          format(field.value, "PPP", { locale: ptBR })
                         ) : (
                           <span>Selecione uma data</span>
                         )}
@@ -257,8 +286,10 @@ export function UpsertAppointmentForm({
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
+                      disabled={(date) =>
+                        date < new Date() || !isDateAvailable(date)
+                      }
                       initialFocus
-                      locale={ptBR}
                     />
                   </PopoverContent>
                 </Popover>
@@ -276,36 +307,23 @@ export function UpsertAppointmentForm({
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  disabled={!isTimeSelectionEnabled}
+                  disabled={!isDateTimeEnabled || !selectedDate}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue
-                        placeholder={
-                          isTimeSelectionEnabled
-                            ? "Selecione um horário"
-                            : "Selecione paciente e médico primeiro"
-                        }
-                      />
+                      <SelectValue placeholder="Selecione um horário" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="08:00:00">08:00</SelectItem>
-                    <SelectItem value="08:30:00">08:30</SelectItem>
-                    <SelectItem value="09:00:00">09:00</SelectItem>
-                    <SelectItem value="09:30:00">09:30</SelectItem>
-                    <SelectItem value="10:00:00">10:00</SelectItem>
-                    <SelectItem value="10:30:00">10:30</SelectItem>
-                    <SelectItem value="11:00:00">11:00</SelectItem>
-                    <SelectItem value="11:30:00">11:30</SelectItem>
-                    <SelectItem value="14:00:00">14:00</SelectItem>
-                    <SelectItem value="14:30:00">14:30</SelectItem>
-                    <SelectItem value="15:00:00">15:00</SelectItem>
-                    <SelectItem value="15:30:00">15:30</SelectItem>
-                    <SelectItem value="16:00:00">16:00</SelectItem>
-                    <SelectItem value="16:30:00">16:30</SelectItem>
-                    <SelectItem value="17:00:00">17:00</SelectItem>
-                    <SelectItem value="17:30:00">17:30</SelectItem>
+                    {availableTimes?.data?.map((time) => (
+                      <SelectItem
+                        key={time.value}
+                        value={time.value}
+                        disabled={!time.available}
+                      >
+                        {time.label} {!time.available && "(Indisponível)"}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -314,15 +332,16 @@ export function UpsertAppointmentForm({
           />
 
           <DialogFooter>
-            <Button
-              type="submit"
-              disabled={upsertAppointmentAction.status === "executing"}
-            >
-              {appointment ? "Salvar" : "Criar"}
+            <Button type="submit" disabled={createAppointmentAction.isPending}>
+              {createAppointmentAction.isPending
+                ? "Criando..."
+                : "Criar agendamento"}
             </Button>
           </DialogFooter>
         </form>
       </Form>
     </DialogContent>
   );
-}
+};
+
+export default UpsertAppointmentForm;

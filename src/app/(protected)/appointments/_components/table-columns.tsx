@@ -4,13 +4,23 @@ import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-import { appointmentsTable, doctorsTable, patientsTable } from "@/db/schema";
+import { appointmentsTable } from "@/db/schema";
 
-import { AppointmentsTableActions } from "./table-actions";
+import AppointmentsTableActions from "./table-actions";
 
 type AppointmentWithRelations = typeof appointmentsTable.$inferSelect & {
-  patient: typeof patientsTable.$inferSelect;
-  doctor: typeof doctorsTable.$inferSelect;
+  patient: {
+    id: string;
+    name: string;
+    email: string;
+    phoneNumber: string;
+    sex: "male" | "female";
+  };
+  doctor: {
+    id: string;
+    name: string;
+    specialty: string;
+  };
 };
 
 export const appointmentsTableColumns: ColumnDef<AppointmentWithRelations>[] = [
@@ -29,20 +39,20 @@ export const appointmentsTableColumns: ColumnDef<AppointmentWithRelations>[] = [
     },
   },
   {
-    id: "specialty",
-    accessorKey: "doctor.specialty",
-    header: "Especialidade",
-  },
-  {
     id: "date",
     accessorKey: "date",
-    header: "Data e Horário",
+    header: "Data e Hora",
     cell: (params) => {
       const appointment = params.row.original;
       return format(new Date(appointment.date), "dd/MM/yyyy 'às' HH:mm", {
         locale: ptBR,
       });
     },
+  },
+  {
+    id: "specialty",
+    accessorKey: "doctor.specialty",
+    header: "Especialidade",
   },
   {
     id: "price",
@@ -60,7 +70,8 @@ export const appointmentsTableColumns: ColumnDef<AppointmentWithRelations>[] = [
   {
     id: "actions",
     cell: (params) => {
-      return <AppointmentsTableActions appointment={params.row.original} />;
+      const appointment = params.row.original;
+      return <AppointmentsTableActions appointment={appointment} />;
     },
   },
 ];
