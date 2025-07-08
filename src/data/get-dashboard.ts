@@ -27,8 +27,9 @@ export const getDashboard = async ({ from, to, session }: Params) => {
     topDoctors, //top 10 médicos mais agendados (id, nome, avatar, especialidade, agendamentos)
     topSpecialties, //top 10 especialidades mais agendadas
     todayAppointments, //agendamentos de hoje
-    dailyAppointmentsData,  
+    dailyAppointmentsData,
   ] = await Promise.all([
+    //total de receita
     db
       .select({
         total: sum(appointmentsTable.appointmentPriceInCents),
@@ -41,6 +42,7 @@ export const getDashboard = async ({ from, to, session }: Params) => {
           lte(appointmentsTable.date, new Date(to)),
         ),
       ),
+    //total de agendamentos
     db
       .select({
         total: count(),
@@ -59,12 +61,14 @@ export const getDashboard = async ({ from, to, session }: Params) => {
       })
       .from(patientsTable)
       .where(eq(patientsTable.clinicId, session.user.clinic.id)),
+    //total de médicos
     db
       .select({
         total: count(),
       })
       .from(doctorsTable)
       .where(eq(doctorsTable.clinicId, session.user.clinic.id)),
+    //top 10 médicos mais agendados
     db
       .select({
         id: doctorsTable.id,
@@ -86,6 +90,7 @@ export const getDashboard = async ({ from, to, session }: Params) => {
       .groupBy(doctorsTable.id)
       .orderBy(desc(count(appointmentsTable.id)))
       .limit(10),
+    //top 10 especialidades mais agendadas
     db
       .select({
         specialty: doctorsTable.specialty,
@@ -102,17 +107,37 @@ export const getDashboard = async ({ from, to, session }: Params) => {
       )
       .groupBy(doctorsTable.specialty)
       .orderBy(desc(count(appointmentsTable.id))),
+    //agendamentos de hoje
     db.query.appointmentsTable.findMany({
+      columns: {
+        id: true,
+        date: true,
+        appointmentPriceInCents: true,
+      },
+      with: {
+        patient: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+            phoneNumber: true,
+            sex: true,
+          },
+        },
+        doctor: {
+          columns: {
+            id: true,
+            name: true,
+            specialty: true,
+          },
+        },
+      },
       where: and(
         eq(appointmentsTable.clinicId, session.user.clinic.id),
-        gte(appointmentsTable.date, new Date()),
-        lte(appointmentsTable.date, new Date()),
+        sql`DATE(${appointmentsTable.date}) = DATE(NOW())`,
       ),
-      with: {
-        patient: true,
-        doctor: true,
-      },
     }),
+    //dados do gráfico de agendamentos
     db
       .select({
         date: sql<string>`DATE(${appointmentsTable.date})`.as("date"),
