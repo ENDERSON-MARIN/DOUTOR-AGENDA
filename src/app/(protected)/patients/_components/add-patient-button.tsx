@@ -22,7 +22,7 @@ export function AddPatientButton() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus />
           Adicionar paciente
         </Button>
       </DialogTrigger>
