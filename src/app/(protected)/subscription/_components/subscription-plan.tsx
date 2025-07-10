@@ -18,6 +18,7 @@ export default function SubscriptionPlan({
     "Cadastro de pacientes",
     "Confirmação manual",
     "Suporte via e-mail",
+    "Suporte via WhatsApp",
   ];
 
   return (
