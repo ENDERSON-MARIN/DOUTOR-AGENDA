@@ -1,7 +1,6 @@
 import {
   PageContainer,
   PageContent,
-  PageHeaderActions,
   PageHeaderContainer,
   PageHeaderContent,
   PageHeaderDescription,
@@ -21,11 +20,8 @@ export default function SubscriptionPage() {
             Gerencie a sua assinatura.
           </PageHeaderDescription>
         </PageHeaderContent>
-        <PageHeaderActions>
-          <></>
-        </PageHeaderActions>
       </PageHeaderContainer>
-      <Separator className="my-4" />
+      <Separator />
       <PageContent>
         <SubscriptionPlan />
       </PageContent>
