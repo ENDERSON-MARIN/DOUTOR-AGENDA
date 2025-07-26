@@ -1,5 +1,4 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import {
   PageContainer,
@@ -18,9 +17,7 @@ export default async function SubscriptionPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  if (!session?.user) {
-    redirect("/login");
-  }
+
   return (
     <PageContainer>
       <PageHeaderContainer>
@@ -33,7 +30,11 @@ export default async function SubscriptionPage() {
       </PageHeaderContainer>
       <Separator />
       <PageContent>
-        <SubscriptionPlan userEmail={session.user.email} />
+      <SubscriptionPlan
+            className="w-[350px]"
+            active={session!.user.plan === "essential"}
+            userEmail={session!.user.email}
+          />
       </PageContent>
     </PageContainer>
   );
