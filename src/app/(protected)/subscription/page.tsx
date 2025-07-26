@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+
 import {
   PageContainer,
   PageContent,
@@ -7,10 +9,15 @@ import {
   PageHeaderTitle,
 } from "@/components/ui/page-container";
 import { Separator } from "@/components/ui/separator";
+import { auth } from "@/lib/auth";
 
-import SubscriptionPlan from "./_components/subscription-plan";
+import { SubscriptionPlan } from "./_components/subscription-plan";
 
-export default function SubscriptionPage() {
+export default async function SubscriptionPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   return (
     <PageContainer>
       <PageHeaderContainer>
@@ -23,7 +30,11 @@ export default function SubscriptionPage() {
       </PageHeaderContainer>
       <Separator />
       <PageContent>
-        <SubscriptionPlan />
+      <SubscriptionPlan
+            className="w-[350px]"
+            active={session!.user.plan === "essential"}
+            userEmail={session!.user.email}
+          />
       </PageContent>
     </PageContainer>
   );
