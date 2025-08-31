@@ -4,14 +4,9 @@ APLICATIVO DE GESTION DE AGENDAMENTOS PARA CLINICAS
 
 # Project Description
 
-Appointment scheduling application for barbershops with the following features:
+A modern barbershop appointment booking application built with Next.js 14, TypeScript and Shadcn UI components. Features include secure authentication via NextAuth with Prisma adapter, form validation using Zod and React Hook Form, and an intuitive calendar interface powered by React Day Picker. The app enables clients to easily schedule haircuts and grooming services while providing barbers with efficient booking management tools. Backend implemented with PostgreSQL and Prisma ORM for type-safe database operations. Styled with Tailwind CSS and enhanced with SweetAlert2 for notifications.
 
-- Allows users to log in (google authentication).
-- Search for barbershops by name.
-- Allows users to reserve appointments for services offered by the barbershop, date and time must be selected.
-- On the appointment screen, it shows confirmed and completed appointments.
-- Users can see details of appointments and cancel them.
-- Shows the list of recommended and popular barbershops.
+
 
 Technologies and tools used in the project:
 
