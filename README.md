@@ -1,8 +1,9 @@
-## Project Title
+
+## Título do Projeto
 
 APLICATIVO DE GESTION DE AGENDAMENTOS PARA CLINICAS
 
-## Project Description
+## Descrição do Projeto
 
 O Doutor Agenda é uma plataforma web moderna e completa para gestão de clínicas, desenvolvida com um foco em desempenho, segurança e uma experiência de usuário intuitiva. O projeto se destaca por oferecer funcionalidades essenciais para a área da saúde, incluindo um sistema de agendamento online, gestão de pacientes, e um painel de controle administrativo com visualização de dados.
 
@@ -26,30 +27,45 @@ Gerenciamento de Estado e Dados: O sistema gerencia o estado do servidor de form
 
 Backend e Banco de Dados: A camada de backend utiliza recursos do Next.js, como Server Actions, e interage com um banco de dados PostgreSQL através do Drizzle ORM, proporcionando uma gestão de dados segura e tipada.
 
-## Screenshots
+## Capturas de Tela
 
-TODO: ADD ...
+<div style="overflow-x: auto;">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 50%;"><img src="./public/screenshots/dashboard.png" alt="Dashboard" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/agendamentos.png" alt="Agendamentos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
+        </tr>
+        <tr>
+            <td style="width: 50%;"><img src="./public/screenshots/medicos.png" alt="Medicos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/pacientes.png" alt="Pacientes" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
+        </tr>
+        <tr>
+            <td style="width: 50%;"><img src="./public/screenshots/planos.png" alt="Planos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/login.png" alt="Login" style="width: 100%; height: auto; max-width: 340px; max-height: 420px; object-fit: cover; margin-right:16px;" /><img src="./public/screenshots/register.png" alt="Register" style="width: 100%; height: auto; max-width: 340px; max-height: 420px; object-fit: cover;" /></td>
+        </tr>
+    </table>
+</div>
 
-## Getting Started
+## Começando
 
-## Prerequisites
+### Pré-requisitos
 
-you need to install following software
+Você precisa instalar o seguinte software
 
 1.  NODEJS(VERSION: 20.10.0)
 2.  NPM(VERSION: 10.2.3)
 3.  GIT
 
-## The easiest way to get started is to clone the repository:
+### A maneira mais fácil para começar é clonar o repositório:
 
 git clone [https://github.com/ENDERSON-MARIN/DOUTOR-AGENDA](https://github.com/ENDERSON-MARIN/DOUTOR-AGENDA)
 
-## Change directory and open in the text editor
+### Mude o diretório e abra no editor de texto
 
 - cd your-project-directory
 - open in your text editor
 
-## Configure your environment variables (Clone the .env.template file and rename it to .env)
+### Configure suas variáveis de ambiente (Clone o arquivo .env.template e renomeie para .env)
 
 - DATABASE_URL="YOUR_CONNECTION_STRING"
 - BETTER_AUTH_SECRET=""
@@ -64,7 +80,7 @@ git clone [https://github.com/ENDERSON-MARIN/DOUTOR-AGENDA](https://github.com/E
 - NEXT_PUBLIC_APP_URL=#Base URL of your app
 - STRIPE_WEBHOOK_SECRET=""
 
-## Very simply start your app
+### Inicie seu aplicativo de forma muito simples
 
 - Run the DB migrations
 
@@ -84,29 +100,30 @@ npx drizzle-kit studio
 npm run dev
 ```
 
-- You can check website will be up and running on localhost
+- Você pode verificar que o site estará funcionando em localhost
   http://localhost:3000
 
 - You can check db will be up and running on localhost
-  http://localhost:5555
+  https://local.drizzle.studio/
 
-## Author
+## Autor
 
 - [Enderson Marín](https://www.marinenderson.com)
 
-## My contact:
+## Meu contato:
 
 - 📧 Email: marinenderson1@gmail.com
 - 🐱 GitHub: https://github.com/ENDERSON-MARIN
 - 🌐 Portfolio: https://portfolio-ecmm.vercel.app/
 - 💼 LinkedIn: https://www.linkedin.com/in/enderson-marin
 
-## Videos Demo
+## Vídeos de Demonstração
 
-- You can watch a demonstration of my projects in the following chanel:
+- Você pode verificar um vídeo de demonstração do meu projeto no seguinte canal:
 
   https://www.youtube.com/channel/UCDIIj706aFneZlfVJucVkhA
 
-## License
+## Licença
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE.md](LICENSE.md) para obter detalhes
+
