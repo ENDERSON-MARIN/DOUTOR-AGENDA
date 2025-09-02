@@ -1,8 +1,8 @@
-# Project Title
+## Project Title
 
 APLICATIVO DE GESTION DE AGENDAMENTOS PARA CLINICAS
 
-# Project Description
+## Project Description
 
 O Doutor Agenda é uma plataforma web moderna e completa para gestão de clínicas, desenvolvida com um foco em desempenho, segurança e uma experiência de usuário intuitiva. O projeto se destaca por oferecer funcionalidades essenciais para a área da saúde, incluindo um sistema de agendamento online, gestão de pacientes, e um painel de controle administrativo com visualização de dados.
 
@@ -32,7 +32,7 @@ TODO: ADD ...
 
 ## Getting Started
 
-### Prerequisites
+## Prerequisites
 
 you need to install following software
 
@@ -40,16 +40,16 @@ you need to install following software
 2.  NPM(VERSION: 10.2.3)
 3.  GIT
 
-# The easiest way to get started is to clone the repository:
+## The easiest way to get started is to clone the repository:
 
 git clone [https://github.com/ENDERSON-MARIN/DOUTOR-AGENDA](https://github.com/ENDERSON-MARIN/DOUTOR-AGENDA)
 
-# Change directory and open in the text editor
+## Change directory and open in the text editor
 
 - cd your-project-directory
 - open in your text editor
 
-# Configure your environment variables (Clone the .env.template file and rename it to .env)
+## Configure your environment variables (Clone the .env.template file and rename it to .env)
 
 - DATABASE_URL="YOUR_CONNECTION_STRING"
 - BETTER_AUTH_SECRET=""
@@ -64,7 +64,7 @@ git clone [https://github.com/ENDERSON-MARIN/DOUTOR-AGENDA](https://github.com/E
 - NEXT_PUBLIC_APP_URL=#Base URL of your app
 - STRIPE_WEBHOOK_SECRET=""
 
-# Very simply start your app
+## Very simply start your app
 
 - Run the DB migrations
 
