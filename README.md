@@ -1,3 +1,4 @@
+
 ## Título do Projeto
 
 APLICATIVO DE GESTION DE AGENDAMENTOS PARA CLINICAS
@@ -125,3 +126,4 @@ npm run dev
 ## Licença
 
 Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE.md](LICENSE.md) para obter detalhes
+
