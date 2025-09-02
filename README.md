@@ -1,4 +1,3 @@
-
 ## Título do Projeto
 
 APLICATIVO DE GESTION DE AGENDAMENTOS PARA CLINICAS
@@ -32,16 +31,16 @@ Backend e Banco de Dados: A camada de backend utiliza recursos do Next.js, como 
 <div style="overflow-x: auto;">
     <table style="width: 100%;">
         <tr>
-            <td style="width: 50%;"><img src="./public/screenshots/dashboard.png" alt="Dashboard" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
-            <td style="width: 50%;"><img src="./public/screenshots/agendamentos.png" alt="Agendamentos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/dashboard.png" alt="Dashboard" style="width: 100%; height: auto; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/agendamentos.png" alt="Agendamentos" style="width: 100%; height: auto; object-fit: cover;" /></td>
         </tr>
         <tr>
-            <td style="width: 50%;"><img src="./public/screenshots/medicos.png" alt="Medicos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
-            <td style="width: 50%;"><img src="./public/screenshots/pacientes.png" alt="Pacientes" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/medicos.png" alt="Medicos" style="width: 100%; height: auto; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/pacientes.png" alt="Pacientes" style="width: 100%; height: auto; object-fit: cover;" /></td>
         </tr>
         <tr>
-            <td style="width: 50%;"><img src="./public/screenshots/planos.png" alt="Planos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
-            <td style="width: 50%;"><img src="./public/screenshots/acount.png" alt="Planos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/planos.png" alt="Planos" style="width: 100%; height: auto; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/acount.png" alt="Planos" style="width: 100%; height: auto; object-fit: cover;" /></td>
         </tr>
     </table>
 </div>
@@ -126,4 +125,3 @@ npm run dev
 ## Licença
 
 Este projeto está licenciado sob a Licença MIT - consulte o arquivo [LICENSE.md](LICENSE.md) para obter detalhes
-
