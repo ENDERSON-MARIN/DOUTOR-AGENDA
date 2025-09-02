@@ -41,7 +41,7 @@ Backend e Banco de Dados: A camada de backend utiliza recursos do Next.js, como 
         </tr>
         <tr>
             <td style="width: 50%;"><img src="./public/screenshots/planos.png" alt="Planos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
-            <td style="width: 50%;"><img src="./public/screenshots/login.png" alt="Login" style="width: 100%; height: auto; max-width: 340px; max-height: 420px; object-fit: cover; margin-right:16px;" /><img src="./public/screenshots/register.png" alt="Register" style="width: 100%; height: auto; max-width: 340px; max-height: 420px; object-fit: cover;" /></td>
+            <td style="width: 50%;"><img src="./public/screenshots/acount.png" alt="Planos" style="width: 100%; height: auto; max-height: 420px; object-fit: cover;" /></td>
         </tr>
     </table>
 </div>
